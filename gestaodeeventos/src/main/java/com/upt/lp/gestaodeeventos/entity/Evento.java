@@ -49,12 +49,10 @@ public class Evento {
     @JoinColumn(name = "id_organizador")
     private Utilizador organizador;
 
-    // Um evento pode ter várias inscrições
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Inscricao> inscricoes = new ArrayList<>();
 
-    // Um evento pode ter várias avaliações
     @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Avaliacao> avaliacoes = new ArrayList<>();

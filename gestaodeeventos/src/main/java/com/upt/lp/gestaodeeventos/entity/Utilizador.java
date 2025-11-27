@@ -36,22 +36,18 @@ public class Utilizador {
     @Column(name = "estado_utilizador", nullable = false, length = 20)
     private EstadoUtilizador estadoUtilizador = EstadoUtilizador.ATIVO;
 
-    // Eventos organizados por este utilizador (se for ORGANIZADOR)
     @OneToMany(mappedBy = "organizador")
     @JsonIgnore
     private List<Evento> eventosOrganizados = new ArrayList<>();
 
-    // Inscrições deste utilizador (se for PARTICIPANTE)
     @OneToMany(mappedBy = "participante")
     @JsonIgnore
     private List<Inscricao> inscricoes = new ArrayList<>();
 
-    // Avaliações feitas por este utilizador (normalmente PARTICIPANTE)
     @OneToMany(mappedBy = "participante")
     @JsonIgnore
     private List<Avaliacao> avaliacoes = new ArrayList<>();
 
-    // Notificações recebidas por este utilizador
     @OneToMany(mappedBy = "participante")
     @JsonIgnore
     private List<Notificacao> notificacoes = new ArrayList<>();
@@ -59,7 +55,6 @@ public class Utilizador {
     public Utilizador() {
     }
 
-    // Getters/Setters
     public Integer getId() {
         return id;
     }

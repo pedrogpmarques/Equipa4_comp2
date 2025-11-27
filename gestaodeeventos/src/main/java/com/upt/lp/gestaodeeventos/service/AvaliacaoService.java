@@ -31,7 +31,6 @@ public class AvaliacaoService {
     private NotificacaoService notificacaoService;
 
 
-    // Criar avaliação
     public Avaliacao criarAvaliacao(Integer idEvento, Integer idParticipante, Avaliacao dados) {
 
         Evento evento = eventoRepository.findById(idEvento)
@@ -40,17 +39,14 @@ public class AvaliacaoService {
         Utilizador participante = utilizadorRepository.findById(idParticipante)
                 .orElseThrow(() -> new ResourceNotFoundException("Participante não encontrado: " + idParticipante));
 
-        // Validar tipo
         if (participante.getTipoUtilizador() != Utilizador.TipoUtilizador.PARTICIPANTE) {
             throw new BadRequestException("Apenas PARTICIPANTES podem avaliar eventos.");
         }
 
-        // Impedir que o organizador avalie o próprio evento
         if (evento.getOrganizador().getId().equals(idParticipante)) {
             throw new BadRequestException("O organizador não pode avaliar o próprio evento.");
         }
 
-        // Validar se está inscrito
         boolean inscrito = evento.getInscricoes().stream()
                 .anyMatch(i -> i.getParticipante().getId().equals(idParticipante));
 
@@ -58,12 +54,10 @@ public class AvaliacaoService {
             throw new BadRequestException("O participante precisa estar inscrito para avaliar o evento.");
         }
 
-        // Verificar se o evento já terminou
         if (evento.getDataFim().isAfter(LocalDateTime.now())) {
             throw new BadRequestException("Só é possível avaliar eventos já terminados.");
         }
 
-        // Verificar se já avaliou
         boolean jaAvaliou = evento.getAvaliacoes().stream()
                 .anyMatch(a -> a.getParticipante().getId().equals(idParticipante));
 
@@ -71,12 +65,10 @@ public class AvaliacaoService {
             throw new BadRequestException("Já existe uma avaliação deste participante para este evento.");
         }
 
-        // Validar pontuação
         if (dados.getPontuacao() == null || dados.getPontuacao() < 1 || dados.getPontuacao() > 5) {
             throw new BadRequestException("A pontuação deve ser entre 1 e 5.");
         }
 
-        // Criar avaliação
         Avaliacao nova = new Avaliacao();
         nova.setEvento(evento);
         nova.setParticipante(participante);
@@ -86,7 +78,6 @@ public class AvaliacaoService {
 
         Avaliacao avaliada = avaliacaoRepository.save(nova);
 
-        // Notificação automática
         notificacaoService.enviarNotificacao(
                 idParticipante,
                 "Avaliação registada",

@@ -31,7 +31,6 @@ public class InscricaoService {
     private NotificacaoService notificacaoService;
 
 
-    // Criar inscrição
     public Inscricao criarInscricao(Integer idEvento, Integer idParticipante) {
 
         Evento evento = eventoRepository.findById(idEvento)
@@ -40,17 +39,14 @@ public class InscricaoService {
         Utilizador participante = utilizadorRepository.findById(idParticipante)
                 .orElseThrow(() -> new ResourceNotFoundException("Participante não encontrado: " + idParticipante));
 
-        // Validar tipo
         if (participante.getTipoUtilizador() != Utilizador.TipoUtilizador.PARTICIPANTE) {
             throw new BadRequestException("Apenas PARTICIPANTES podem inscrever-se em eventos.");
         }
 
-        // Verificar capacidade
         if (evento.getCapacidade() != null && evento.getCapacidade() <= 0) {
             throw new BadRequestException("O evento está esgotado. Não há vagas disponíveis.");
         }
 
-        // Verificar se já está inscrito
         boolean jaInscrito = evento.getInscricoes().stream()
                 .anyMatch(i -> i.getParticipante().getId().equals(idParticipante));
 
@@ -58,20 +54,17 @@ public class InscricaoService {
             throw new BadRequestException("Este participante já está inscrito neste evento.");
         }
 
-        // Criar inscrição
         Inscricao nova = new Inscricao();
         nova.setEvento(evento);
         nova.setParticipante(participante);
         nova.setEstadoInscricao(Inscricao.EstadoInscricao.CONFIRMADA);
         nova.setDataInscricao(LocalDateTime.now());
 
-        // Reduzir vagas
         if (evento.getCapacidade() != null) {
             evento.setCapacidade(evento.getCapacidade() - 1);
             eventoRepository.save(evento);
         }
 
-        // Notificação automática
         notificacaoService.enviarNotificacao(
                 idParticipante,
                 "Inscrição Confirmada",
@@ -93,7 +86,6 @@ public class InscricaoService {
     }
 
 
-    // Cancelar inscrição
     public void cancelarInscricao(Integer idInscricao, Integer idParticipante) {
 
         Inscricao i = getById(idInscricao);
@@ -102,7 +94,6 @@ public class InscricaoService {
             throw new BadRequestException("Só o próprio participante pode cancelar a sua inscrição.");
         }
 
-        // Aumentar vagas
         Evento evento = i.getEvento();
         if (evento.getCapacidade() != null) {
             evento.setCapacidade(evento.getCapacidade() + 1);
@@ -112,7 +103,6 @@ public class InscricaoService {
         i.setEstadoInscricao(Inscricao.EstadoInscricao.CANCELADA);
         inscricaoRepository.save(i);
 
-        // Notificação automática
         notificacaoService.enviarNotificacao(
                 idParticipante,
                 "Inscrição Cancelada",

@@ -1,12 +1,14 @@
 package com.upt.lp.gestaodeeventos.service;
 
+import com.upt.lp.gestaodeeventos.entity.Evento;
+import com.upt.lp.gestaodeeventos.entity.Inscricao;
 import com.upt.lp.gestaodeeventos.entity.Notificacao;
 import com.upt.lp.gestaodeeventos.entity.Utilizador;
 import com.upt.lp.gestaodeeventos.exception.BadRequestException;
 import com.upt.lp.gestaodeeventos.exception.ResourceNotFoundException;
+import com.upt.lp.gestaodeeventos.repository.EventoRepository;
 import com.upt.lp.gestaodeeventos.repository.NotificacaoRepository;
 import com.upt.lp.gestaodeeventos.repository.UtilizadorRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,8 +24,10 @@ public class NotificacaoService {
     @Autowired
     private UtilizadorRepository utilizadorRepository;
 
+    @Autowired
+    private EventoRepository eventoRepository;
 
-    // 🔔 Enviar notificação automática
+    // 🔔 Enviar notificação a UM participante
     public void enviarNotificacao(Integer idParticipante, String titulo, String mensagem) {
 
         Utilizador participante = utilizadorRepository.findById(idParticipante)
@@ -39,6 +43,25 @@ public class NotificacaoService {
         notificacaoRepository.save(n);
     }
 
+    // 🔔 Enviar notificação a TODOS os participantes inscritos num evento
+    public void enviarNotificacaoParaParticipantesDoEvento(Integer idEvento, String titulo, String mensagem) {
+
+        Evento evento = eventoRepository.findById(idEvento)
+                .orElseThrow(() -> new ResourceNotFoundException("Evento não encontrado: " + idEvento));
+
+        List<Inscricao> inscricoes = evento.getInscricoes();
+
+        if (inscricoes == null || inscricoes.isEmpty()) {
+            throw new BadRequestException("O evento não tem participantes inscritos.");
+        }
+
+        for (Inscricao insc : inscricoes) {
+            Utilizador participante = insc.getParticipante();
+            if (participante != null) {
+                enviarNotificacao(participante.getId(), titulo, mensagem);
+            }
+        }
+    }
 
     // 🔔 Listar notificações de um participante
     public List<Notificacao> listarNotificacoes(Integer idParticipante) {
@@ -48,7 +71,6 @@ public class NotificacaoService {
 
         return participante.getNotificacoes();
     }
-
 
     // 🔔 Marcar notificação como lida
     public Notificacao marcarComoLida(Integer idNotificacao, Integer idParticipante) {

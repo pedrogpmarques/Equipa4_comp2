@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UtilizadorRepository extends JpaRepository<Utilizador, Integer> {
 
-    // útil para verificar se um email já existe
     boolean existsByEmail(String email);
 
     Utilizador findByEmail(String email);

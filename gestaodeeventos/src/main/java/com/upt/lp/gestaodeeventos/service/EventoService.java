@@ -20,58 +20,47 @@ public class EventoService {
     @Autowired
     private UtilizadorRepository utilizadorRepository;
 
-    // Criar evento (apenas ORGANIZADOR)
     public Evento criarEvento(Evento e, Integer idOrganizador) {
 
-        // Validar que o organizador existe
         Utilizador organizador = utilizadorRepository.findById(idOrganizador)
                 .orElseThrow(() -> new ResourceNotFoundException("Organizador não encontrado: " + idOrganizador));
 
-        // Validar que o organizador tem o tipo correto
         if (organizador.getTipoUtilizador() != Utilizador.TipoUtilizador.ORGANIZADOR) {
             throw new BadRequestException("Apenas utilizadores do tipo ORGANIZADOR podem criar eventos.");
         }
 
-        // Validar datas
         if (e.getDataInicio() != null && e.getDataFim() != null) {
             if (e.getDataFim().isBefore(e.getDataInicio())) {
                 throw new BadRequestException("A data de fim do evento não pode ser anterior à data de início.");
             }
         }
 
-        // Validar capacidade
         if (e.getCapacidade() != null && e.getCapacidade() < 1) {
             throw new BadRequestException("A capacidade do evento deve ser maior que 0.");
         }
 
-        // Definir o organizador no evento
         e.setOrganizador(organizador);
 
         return eventoRepository.save(e);
     }
 
-    // Buscar evento por ID
     public Evento getById(Integer id) {
         return eventoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Evento não encontrado: " + id));
     }
 
-    // Listar todos os eventos
     public List<Evento> listarEventos() {
         return eventoRepository.findAll();
     }
 
-    // Atualizar evento (apenas o organizador original pode atualizar)
     public Evento atualizarEvento(Integer idEvento, Evento dados, Integer idOrganizador) {
 
         Evento existente = getById(idEvento);
 
-        // Garantir que o organizador é o mesmo
         if (!existente.getOrganizador().getId().equals(idOrganizador)) {
             throw new BadRequestException("Apenas o organizador original pode atualizar este evento.");
         }
 
-        // Actualizar campos
         if (dados.getTitulo() != null) existente.setTitulo(dados.getTitulo());
         if (dados.getDescricao() != null) existente.setDescricao(dados.getDescricao());
         if (dados.getCategoria() != null) existente.setCategoria(dados.getCategoria());
@@ -99,7 +88,6 @@ public class EventoService {
         return eventoRepository.save(existente);
     }
 
-    // Apagar evento (apenas organizador original pode apagar)
     public void apagarEvento(Integer idEvento, Integer idOrganizador) {
 
         Evento evento = getById(idEvento);
