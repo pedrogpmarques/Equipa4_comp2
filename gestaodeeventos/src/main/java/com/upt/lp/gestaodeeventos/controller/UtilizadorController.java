@@ -6,7 +6,6 @@ import com.upt.lp.gestaodeeventos.entity.Utilizador;
 import com.upt.lp.gestaodeeventos.service.UtilizadorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +27,7 @@ public class UtilizadorController {
         return new UtilizadorDTO(criado);
     }
 
-    @GetMapping
+   @GetMapping
     public List<UtilizadorDTO> listar() {
         return utilizadorService.listarTodos()
                 .stream()
@@ -41,6 +40,15 @@ public class UtilizadorController {
         return new UtilizadorDTO(utilizadorService.getById(id));
     }
 
+   
+    @GetMapping("/ordenado")
+    public List<UtilizadorDTO> listarOrdenadoPorNome() {
+        return utilizadorService.listarOrdenadoPorNome()
+                .stream()
+                .map(UtilizadorDTO::new)
+                .collect(Collectors.toList());
+    }
+    
     @PutMapping("/{id}")
     public UtilizadorDTO atualizar(@PathVariable Integer id,
                                    @RequestBody UtilizadorCreateDTO dto) {

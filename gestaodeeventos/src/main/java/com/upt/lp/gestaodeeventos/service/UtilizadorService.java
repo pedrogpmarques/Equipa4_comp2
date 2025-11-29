@@ -7,7 +7,7 @@ import com.upt.lp.gestaodeeventos.exception.ResourceNotFoundException;
 import com.upt.lp.gestaodeeventos.repository.UtilizadorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.Sort;
 import java.util.List;
 
 @Service
@@ -42,6 +42,10 @@ public class UtilizadorService {
         return u;
     }
 
+    public List<Utilizador> listarOrdenadoPorNome() {
+        return utilizadorRepository.findAll(Sort.by("nomeUtilizador").ascending());
+    }
+    
     public List<Utilizador> listarTodos() {
         return utilizadorRepository.findAll();
     }
