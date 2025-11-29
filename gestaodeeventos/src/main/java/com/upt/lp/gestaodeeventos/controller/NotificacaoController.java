@@ -26,6 +26,11 @@ public class NotificacaoController {
         );
     }
 
+    @PutMapping("/ler-todas")
+    public void marcarTodasComoLidas(@RequestParam Integer participanteId) {
+        notificacaoService.marcarTodasComoLidas(participanteId);
+    }
+    
     @PostMapping("/evento/{eventoId}")
     public void notificarParticipantesEvento(@PathVariable Integer eventoId,
                                              @RequestBody NotificaoCreateDTO dto) {

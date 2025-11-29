@@ -63,7 +63,26 @@ public class NotificacaoService {
         }
     }
 
-    // 🔔 Listar notificações de um participante
+    
+    public void marcarTodasComoLidas(Integer participanteId) {
+
+       
+        List<Notificacao> notificacoes = notificacaoRepository.findByParticipanteId(participanteId);
+
+        if (notificacoes.isEmpty()) {
+            return; 
+        }
+
+    
+        for (Notificacao n : notificacoes) {
+            n.setEstado(Notificacao.EstadoNotificacao.LIDA);
+        }
+
+     
+        notificacaoRepository.saveAll(notificacoes);
+    } 
+    
+  
     public List<Notificacao> listarNotificacoes(Integer idParticipante) {
 
         Utilizador participante = utilizadorRepository.findById(idParticipante)
