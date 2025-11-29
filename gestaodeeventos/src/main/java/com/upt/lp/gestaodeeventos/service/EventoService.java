@@ -9,6 +9,7 @@ import com.upt.lp.gestaodeeventos.repository.UtilizadorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -40,6 +41,10 @@ public class EventoService {
         }
 
         e.setOrganizador(organizador);
+
+        if (e.getEstadoEvento() == null) {
+            e.setEstadoEvento(Evento.EstadoEvento.ATIVO);
+        }
 
         return eventoRepository.save(e);
     }
@@ -86,6 +91,27 @@ public class EventoService {
         }
 
         return eventoRepository.save(existente);
+    }
+
+    public List<Evento> filtrarEventos(Evento.EstadoEvento estado,
+                                       LocalDateTime inicio,
+                                       LocalDateTime fim) {
+
+        return eventoRepository.findAll().stream()
+                .filter(e -> estado == null || e.getEstadoEvento() == estado)
+                .filter(e -> inicio == null || e.getDataInicio() == null || !e.getDataInicio().isBefore(inicio))
+                .filter(e -> fim == null || e.getDataInicio() == null || !e.getDataInicio().isAfter(fim))
+                .toList();
+    }
+
+    public List<Evento> listarEventosDisponiveis() {
+        LocalDateTime agora = LocalDateTime.now();
+
+        return eventoRepository.findAll().stream()
+                .filter(e -> e.getEstadoEvento() == Evento.EstadoEvento.ATIVO)
+                .filter(e -> e.getCapacidade() != null && e.getCapacidade() > 0)
+                .filter(e -> e.getDataFim() == null || e.getDataFim().isAfter(agora))
+                .toList();
     }
 
     public void apagarEvento(Integer idEvento, Integer idOrganizador) {
