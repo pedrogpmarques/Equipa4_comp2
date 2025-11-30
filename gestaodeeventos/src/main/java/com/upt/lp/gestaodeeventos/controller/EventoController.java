@@ -7,7 +7,9 @@ import com.upt.lp.gestaodeeventos.exception.BadRequestException;
 import com.upt.lp.gestaodeeventos.service.EventoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -101,5 +103,15 @@ public class EventoController {
     public void apagar(@PathVariable Integer id,
                        @RequestParam Integer organizadorId) {
         eventoService.apagarEvento(id, organizadorId);
+    }
+    
+    @GetMapping("/pagina")
+    public ResponseEntity<Page<EventoDTO>> listarPaginado(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        Page<EventoDTO> pageDTO = eventoService.listarPaginado(page, size)
+                .map(EventoDTO::new);
+        return ResponseEntity.ok(pageDTO);
     }
 }

@@ -8,6 +8,10 @@ import com.upt.lp.gestaodeeventos.repository.EventoRepository;
 import com.upt.lp.gestaodeeventos.repository.UtilizadorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -124,4 +128,12 @@ public class EventoService {
 
         eventoRepository.delete(evento);
     }
+    
+    public Page<Evento> listarPaginado(int page, int size) {
+        // Ordena pelo campo 'dataEvento' de forma decrescente (mais novos primeiro)
+        Pageable pageable = PageRequest.of(page, size, Sort.by("dataEvento").descending());
+        return eventoRepository.findAll(pageable);
+    }
+    
+    
 }
