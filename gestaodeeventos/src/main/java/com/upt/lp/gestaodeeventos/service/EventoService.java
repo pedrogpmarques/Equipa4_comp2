@@ -130,7 +130,6 @@ public class EventoService {
     }
     
     public Page<Evento> listarPaginado(int page, int size) {
-        // Ordena pelo campo 'dataEvento' de forma decrescente (mais novos primeiro)
         Pageable pageable = PageRequest.of(page, size, Sort.by("dataEvento").descending());
         return eventoRepository.findAll(pageable);
     }

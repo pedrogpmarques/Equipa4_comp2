@@ -109,7 +109,6 @@ public class EventoController {
     public ResponseEntity<Page<EventoDTO>> listarPaginado(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        
         Page<EventoDTO> pageDTO = eventoService.listarPaginado(page, size)
                 .map(EventoDTO::new);
         return ResponseEntity.ok(pageDTO);
