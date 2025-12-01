@@ -118,16 +118,14 @@ public class EventoService {
                 .toList();
     }
 
-    public void apagarEvento(Integer idEvento, Integer idOrganizador) {
+    public void cancelarEvento(Integer id) {
+        Evento e = eventoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Evento não encontrado."));
 
-        Evento evento = getById(idEvento);
-
-        if (!evento.getOrganizador().getId().equals(idOrganizador)) {
-            throw new BadRequestException("Apenas o organizador original pode apagar este evento.");
-        }
-
-        eventoRepository.delete(evento);
+        e.setEstadoEvento(Evento.EstadoEvento.CANCELADO);
+        eventoRepository.save(e);
     }
+
     
     public Page<Evento> listarPaginado(int page, int size) {
     	

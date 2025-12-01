@@ -99,9 +99,9 @@ public class EventoController {
         return new EventoDTO(atualizado);
     }
 
-    @DeleteMapping("/{id}")
-    public void apagar(@PathVariable Integer id,
-                       @RequestParam Integer organizadorId) {
-        eventoService.apagarEvento(id, organizadorId);
+    @PutMapping("/{id}/cancelar")
+    public void cancelarEvento(@PathVariable Integer id) {
+        eventoService.cancelarEvento(id);
     }
+
 }

@@ -61,8 +61,9 @@ public class UtilizadorController {
         return new UtilizadorDTO(atualizado);
     }
 
-    @DeleteMapping("/{id}")
-    public void apagar(@PathVariable Integer id) {
-        utilizadorService.apagarUtilizador(id);
+    @PutMapping("/{id}/inativar")
+    public void inativarUtilizador(@PathVariable Integer id) {
+        utilizadorService.inativarUtilizador(id);
     }
+
 }

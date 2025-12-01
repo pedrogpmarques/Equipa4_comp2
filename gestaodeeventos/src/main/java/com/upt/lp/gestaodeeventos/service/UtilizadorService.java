@@ -64,8 +64,12 @@ public class UtilizadorService {
         return utilizadorRepository.save(existente);
     }
 
-    public void apagarUtilizador(Integer id) {
-        Utilizador u = getById(id);
-        utilizadorRepository.delete(u);
+    public void inativarUtilizador(Integer id) {
+        Utilizador u = utilizadorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilizador não encontrado."));
+
+        u.setEstadoUtilizador(Utilizador.EstadoUtilizador.INATIVO);
+        utilizadorRepository.save(u);
     }
+
 }
