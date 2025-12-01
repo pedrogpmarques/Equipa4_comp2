@@ -130,6 +130,7 @@ public class EventoService {
     }
     
     public Page<Evento> listarPaginado(int page, int size) {
+    	
         Pageable pageable = PageRequest.of(page, size, Sort.by("dataEvento").descending());
         return eventoRepository.findAll(pageable);
     }

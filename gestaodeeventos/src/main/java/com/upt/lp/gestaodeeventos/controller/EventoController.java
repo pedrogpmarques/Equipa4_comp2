@@ -104,13 +104,4 @@ public class EventoController {
                        @RequestParam Integer organizadorId) {
         eventoService.apagarEvento(id, organizadorId);
     }
-    
-    @GetMapping("/pagina")
-    public ResponseEntity<Page<EventoDTO>> listarPaginado(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Page<EventoDTO> pageDTO = eventoService.listarPaginado(page, size)
-                .map(EventoDTO::new);
-        return ResponseEntity.ok(pageDTO);
-    }
 }
