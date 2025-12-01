@@ -35,6 +35,12 @@ public class InscricaoService {
 
         Evento evento = eventoRepository.findById(idEvento)
                 .orElseThrow(() -> new ResourceNotFoundException("Evento não encontrado: " + idEvento));
+        
+        if (evento.getEstadoEvento() != Evento.EstadoEvento.ATIVO) {
+            throw new BadRequestException("Só é possível inscrever em eventos com estado ATIVO.");
+        }
+        
+        
 
         Utilizador participante = utilizadorRepository.findById(idParticipante)
                 .orElseThrow(() -> new ResourceNotFoundException("Participante não encontrado: " + idParticipante));
@@ -73,6 +79,8 @@ public class InscricaoService {
 
         return inscricaoRepository.save(nova);
     }
+    
+    
 
 
     public List<Inscricao> listarInscricoes() {
@@ -109,4 +117,5 @@ public class InscricaoService {
                 "Cancelaste a inscrição no evento: " + evento.getTitulo()
         );
     }
+    
 }

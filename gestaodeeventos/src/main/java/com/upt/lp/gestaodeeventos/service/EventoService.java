@@ -117,6 +117,25 @@ public class EventoService {
                 .filter(e -> e.getDataFim() == null || e.getDataFim().isAfter(agora))
                 .toList();
     }
+    public Evento ativarEvento(Integer eventoId, Integer organizadorId) {
+
+        Evento evento = eventoRepository.findById(eventoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Evento não encontrado."));
+
+        if (evento.getOrganizador() == null ||
+            !evento.getOrganizador().getId().equals(organizadorId)) {
+            throw new BadRequestException("Apenas o organizador deste evento o pode ativar.");
+        }
+
+        if (evento.getEstadoEvento() == Evento.EstadoEvento.ATIVO) {
+            throw new BadRequestException("O evento já se encontra ativo.");
+        }
+
+        evento.setEstadoEvento(Evento.EstadoEvento.ATIVO);
+
+        return eventoRepository.save(evento);
+    }
+
 
     public void cancelarEvento(Integer id) {
         Evento e = eventoRepository.findById(id)

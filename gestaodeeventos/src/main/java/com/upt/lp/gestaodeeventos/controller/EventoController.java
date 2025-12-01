@@ -98,6 +98,14 @@ public class EventoController {
         Evento atualizado = eventoService.atualizarEvento(id, dados, organizadorId);
         return new EventoDTO(atualizado);
     }
+    @PutMapping("/{id}/ativar")
+    public EventoDTO ativarEvento(@PathVariable Integer id,
+                                  @RequestParam Integer organizadorId) {
+
+        Evento evento = eventoService.ativarEvento(id, organizadorId);
+        return new EventoDTO(evento);
+    }
+
 
     @PutMapping("/{id}/cancelar")
     public void cancelarEvento(@PathVariable Integer id) {
