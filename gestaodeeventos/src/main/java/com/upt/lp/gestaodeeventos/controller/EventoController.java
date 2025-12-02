@@ -2,17 +2,20 @@ package com.upt.lp.gestaodeeventos.controller;
 
 import com.upt.lp.gestaodeeventos.dto.EventoCreateDTO;
 import com.upt.lp.gestaodeeventos.dto.EventoDTO;
+import com.upt.lp.gestaodeeventos.dto.AvaliacaoDTO;
 import com.upt.lp.gestaodeeventos.entity.Evento;
+import com.upt.lp.gestaodeeventos.entity.Avaliacao;
 import com.upt.lp.gestaodeeventos.exception.BadRequestException;
 import com.upt.lp.gestaodeeventos.service.EventoService;
+import com.upt.lp.gestaodeeventos.service.AvaliacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 @RestController
@@ -21,6 +24,9 @@ public class EventoController {
 
     @Autowired
     private EventoService eventoService;
+
+    @Autowired
+    private AvaliacaoService avaliacaoService;
 
     @PostMapping
     public EventoDTO criar(@RequestParam Integer organizadorId,
@@ -56,6 +62,7 @@ public class EventoController {
         }
 
         Evento.EstadoEvento estadoEnum = null;
+
         if (estado != null) {
             try {
                 estadoEnum = Evento.EstadoEvento.valueOf(estado.toUpperCase());
@@ -98,6 +105,7 @@ public class EventoController {
         Evento atualizado = eventoService.atualizarEvento(id, dados, organizadorId);
         return new EventoDTO(atualizado);
     }
+
     @PutMapping("/{id}/ativar")
     public EventoDTO ativarEvento(@PathVariable Integer id,
                                   @RequestParam Integer organizadorId) {
@@ -106,10 +114,37 @@ public class EventoController {
         return new EventoDTO(evento);
     }
 
-
     @PutMapping("/{id}/cancelar")
     public void cancelarEvento(@PathVariable Integer id) {
         eventoService.cancelarEvento(id);
+    }
+
+
+    @GetMapping("/{id}/avaliacoes")
+    public List<AvaliacaoDTO> listarAvaliacoesDoEvento(@PathVariable Integer id) {
+        return avaliacaoService.listarPorEvento(id)
+                .stream()
+                .map(AvaliacaoDTO::new)
+                .collect(Collectors.toList());
+    }
+
+
+    @GetMapping("/{id}/avaliacoes/media")
+    public Map<String, Object> obterMediaAvaliacoes(@PathVariable Integer id) {
+
+        var avaliacoes = avaliacaoService.listarPorEvento(id);
+
+        double media = avaliacoes.stream()
+                .mapToInt(Avaliacao::getPontuacao)
+                .average()
+                .orElse(0.0);
+
+        Map<String, Object> resposta = new HashMap<>();
+        resposta.put("eventoId", id);
+        resposta.put("mediaClassificacao", media);
+        resposta.put("totalAvaliacoes", avaliacoes.size());
+
+        return resposta;
     }
 
 }
