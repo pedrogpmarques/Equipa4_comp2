@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.upt.lp.gestaodeeventos.dto.LoginRequestDTO;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/utilizadores")
@@ -48,6 +50,22 @@ public class UtilizadorController {
                 .map(UtilizadorDTO::new)
                 .collect(Collectors.toList());
     }
+    
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO dto) {
+        try {
+            Utilizador u = utilizadorService.autenticar(dto.getEmail(), dto.getSenha());
+            return ResponseEntity.ok(new UtilizadorDTO(u));
+        } catch (RuntimeException ex) {
+            return switch (ex.getMessage()) {
+                case "EMAIL_NAO_EXISTE" -> ResponseEntity.status(404).body("Email não existe");
+                case "CONTA_INATIVA" -> ResponseEntity.status(403).body("Conta inativa");
+                case "PASSWORD_INVALIDA" -> ResponseEntity.status(401).body("Password inválida");
+                default -> ResponseEntity.status(400).body("Erro no login");
+            };
+        }
+    }
+
     
     @PutMapping("/{id}")
     public UtilizadorDTO atualizar(@PathVariable Integer id,

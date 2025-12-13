@@ -35,12 +35,12 @@ public class UtilizadorService {
     }
 
     public Utilizador getByEmail(String email) {
-        Utilizador u = utilizadorRepository.findByEmail(email);
-        if (u == null) {
-            throw new ResourceNotFoundException("Utilizador com email " + email + " não encontrado.");
-        }
-        return u;
+        return utilizadorRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Utilizador com email " + email + " não encontrado.")
+                );
     }
+
 
     public List<Utilizador> listarOrdenadoPorNome() {
         return utilizadorRepository.findAll(Sort.by("nomeUtilizador").ascending());
@@ -71,5 +71,22 @@ public class UtilizadorService {
         u.setEstadoUtilizador(Utilizador.EstadoUtilizador.INATIVO);
         utilizadorRepository.save(u);
     }
+    public Utilizador autenticar(String email, String senha) {
+        Utilizador u = utilizadorRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("EMAIL_NAO_EXISTE"));
+
+        if (u.getEstadoUtilizador() != null && u.getEstadoUtilizador().toString().equalsIgnoreCase("INATIVO")) {
+            throw new RuntimeException("CONTA_INATIVA");
+        }
+
+
+        if (u.getSenhaUtilizador() == null || !u.getSenhaUtilizador().equals(senha)) {
+            throw new RuntimeException("PASSWORD_INVALIDA");
+        }
+
+        return u;
+    }
+
+
 
 }
