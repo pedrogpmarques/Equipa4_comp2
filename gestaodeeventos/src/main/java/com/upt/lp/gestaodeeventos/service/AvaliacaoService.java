@@ -30,7 +30,6 @@ public class AvaliacaoService {
     @Autowired
     private NotificacaoService notificacaoService;
 
-
     public Avaliacao criarAvaliacao(Integer idEvento, Integer idParticipante, Avaliacao dados) {
 
         Evento evento = eventoRepository.findById(idEvento)
@@ -87,7 +86,6 @@ public class AvaliacaoService {
         return avaliada;
     }
 
-
     public List<Avaliacao> listarAvaliacao() {
         return avaliacaoRepository.findAll();
     }
@@ -95,5 +93,14 @@ public class AvaliacaoService {
     public Avaliacao getById(Integer id) {
         return avaliacaoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Avaliação não encontrada: " + id));
+    }
+
+    public List<Avaliacao> listarPorEvento(Integer idEvento) {
+
+        if (!eventoRepository.existsById(idEvento)) {
+            throw new ResourceNotFoundException("Evento não encontrado: " + idEvento);
+        }
+
+        return avaliacaoRepository.findByEventoId(idEvento);
     }
 }
