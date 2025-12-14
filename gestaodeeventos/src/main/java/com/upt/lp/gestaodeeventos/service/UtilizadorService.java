@@ -1,13 +1,13 @@
 package com.upt.lp.gestaodeeventos.service;
 
 import com.upt.lp.gestaodeeventos.entity.Utilizador;
-import com.upt.lp.gestaodeeventos.entity.Utilizador.TipoUtilizador;
 import com.upt.lp.gestaodeeventos.exception.BadRequestException;
 import com.upt.lp.gestaodeeventos.exception.ResourceNotFoundException;
 import com.upt.lp.gestaodeeventos.repository.UtilizadorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -22,7 +22,8 @@ public class UtilizadorService {
             throw new BadRequestException("Já existe um utilizador com este email.");
         }
 
-        u.setTipoUtilizador(TipoUtilizador.PARTICIPANTE);
+        // defaults
+        u.setTipoUtilizador(Utilizador.TipoUtilizador.PARTICIPANTE);
         u.setEstadoUtilizador(Utilizador.EstadoUtilizador.ATIVO);
 
         return utilizadorRepository.save(u);
@@ -41,11 +42,10 @@ public class UtilizadorService {
                 );
     }
 
-
     public List<Utilizador> listarOrdenadoPorNome() {
         return utilizadorRepository.findAll(Sort.by("nomeUtilizador").ascending());
     }
-    
+
     public List<Utilizador> listarTodos() {
         return utilizadorRepository.findAll();
     }
@@ -71,6 +71,7 @@ public class UtilizadorService {
         u.setEstadoUtilizador(Utilizador.EstadoUtilizador.INATIVO);
         utilizadorRepository.save(u);
     }
+
     public Utilizador autenticar(String email, String senha) {
         Utilizador u = utilizadorRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("EMAIL_NAO_EXISTE"));
@@ -79,7 +80,6 @@ public class UtilizadorService {
             throw new RuntimeException("CONTA_INATIVA");
         }
 
-
         if (u.getSenhaUtilizador() == null || !u.getSenhaUtilizador().equals(senha)) {
             throw new RuntimeException("PASSWORD_INVALIDA");
         }
@@ -87,6 +87,25 @@ public class UtilizadorService {
         return u;
     }
 
+    public Utilizador atualizarEstadoETipo(Integer id, String estado, String tipo) {
 
+        Utilizador u = utilizadorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("UTILIZADOR_NAO_EXISTE"));
+
+      
+        if (u.getTipoUtilizador() == Utilizador.TipoUtilizador.ADMIN) {
+            throw new RuntimeException("NAO_PODE_ALTERAR_ADMIN");
+        }
+
+        if (estado != null && !estado.isBlank()) {
+            u.setEstadoUtilizador(Utilizador.EstadoUtilizador.valueOf(estado.toUpperCase()));
+        }
+
+        if (tipo != null && !tipo.isBlank()) {
+            u.setTipoUtilizador(Utilizador.TipoUtilizador.valueOf(tipo.toUpperCase()));
+        }
+
+        return utilizadorRepository.save(u);
+    }
 
 }

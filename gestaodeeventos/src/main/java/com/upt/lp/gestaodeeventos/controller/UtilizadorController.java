@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import com.upt.lp.gestaodeeventos.dto.LoginRequestDTO;
 import org.springframework.http.ResponseEntity;
+import com.upt.lp.gestaodeeventos.dto.UtilizadorAdminUpdateDTO;
+import org.springframework.http.ResponseEntity;
+
 
 @RestController
 @RequestMapping("/api/utilizadores")
@@ -83,5 +86,26 @@ public class UtilizadorController {
     public void inativarUtilizador(@PathVariable Integer id) {
         utilizadorService.inativarUtilizador(id);
     }
+    @PutMapping("/{id}/admin-update")
+    public ResponseEntity<?> adminUpdate(@PathVariable("id") Integer id,
+                                         @RequestBody UtilizadorAdminUpdateDTO dto) {
+        try {
+            Utilizador atualizado = utilizadorService.atualizarEstadoETipo(
+                    id,
+                    dto.getEstadoUtilizador(),
+                    dto.getTipoUtilizador()
+            );
+            return ResponseEntity.ok(new UtilizadorDTO(atualizado));
+        } catch (RuntimeException ex) {
+
+            if ("NAO_PODE_ALTERAR_ADMIN".equals(ex.getMessage())) {
+                return ResponseEntity.status(403).body("Não é permitido alterar um utilizador ADMIN.");
+            }
+
+            return ResponseEntity.status(400).body(ex.getMessage());
+        }
+    }
+
+
 
 }

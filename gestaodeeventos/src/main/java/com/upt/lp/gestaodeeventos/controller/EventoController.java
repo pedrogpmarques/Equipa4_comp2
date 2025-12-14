@@ -29,8 +29,9 @@ public class EventoController {
     private AvaliacaoService avaliacaoService;
 
     @PostMapping
-    public EventoDTO criar(@RequestParam Integer organizadorId,
-                           @RequestBody EventoCreateDTO dto) {
+    public EventoDTO criar(
+            @RequestParam(name = "organizadorId") Integer organizadorId,
+            @RequestBody EventoCreateDTO dto) {
 
         Evento dados = new Evento();
         dados.setTitulo(dto.getTitulo());
@@ -47,11 +48,11 @@ public class EventoController {
 
     @GetMapping
     public List<EventoDTO> listar(
-            @RequestParam(required = false) String estado,
-            @RequestParam(required = false)
+            @RequestParam(name = "estado", required = false) String estado,
+            @RequestParam(name = "inicio", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             LocalDateTime inicio,
-            @RequestParam(required = false)
+            @RequestParam(name = "fim", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
             LocalDateTime fim) {
 
@@ -89,9 +90,10 @@ public class EventoController {
     }
 
     @PutMapping("/{id}")
-    public EventoDTO atualizar(@PathVariable Integer id,
-                               @RequestParam Integer organizadorId,
-                               @RequestBody EventoCreateDTO dto) {
+    public EventoDTO atualizar(
+            @PathVariable Integer id,
+            @RequestParam(name = "organizadorId") Integer organizadorId,
+            @RequestBody EventoCreateDTO dto) {
 
         Evento dados = new Evento();
         dados.setTitulo(dto.getTitulo());
@@ -107,8 +109,9 @@ public class EventoController {
     }
 
     @PutMapping("/{id}/ativar")
-    public EventoDTO ativarEvento(@PathVariable Integer id,
-                                  @RequestParam Integer organizadorId) {
+    public EventoDTO ativarEvento(
+            @PathVariable Integer id,
+            @RequestParam(name = "organizadorId") Integer organizadorId) {
 
         Evento evento = eventoService.ativarEvento(id, organizadorId);
         return new EventoDTO(evento);
@@ -119,7 +122,6 @@ public class EventoController {
         eventoService.cancelarEvento(id);
     }
 
-
     @GetMapping("/{id}/avaliacoes")
     public List<AvaliacaoDTO> listarAvaliacoesDoEvento(@PathVariable Integer id) {
         return avaliacaoService.listarPorEvento(id)
@@ -127,7 +129,6 @@ public class EventoController {
                 .map(AvaliacaoDTO::new)
                 .collect(Collectors.toList());
     }
-
 
     @GetMapping("/{id}/avaliacoes/media")
     public Map<String, Object> obterMediaAvaliacoes(@PathVariable Integer id) {
@@ -146,5 +147,4 @@ public class EventoController {
 
         return resposta;
     }
-
 }
