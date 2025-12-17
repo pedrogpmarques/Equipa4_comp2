@@ -27,12 +27,12 @@ public class NotificacaoController {
     }
 
     @PutMapping("/ler-todas")
-    public void marcarTodasComoLidas(@RequestParam Integer participanteId) {
+    public void marcarTodasComoLidas(@RequestParam("participanteId") Integer participanteId) {
         notificacaoService.marcarTodasComoLidas(participanteId);
     }
-    
+
     @PostMapping("/evento/{eventoId}")
-    public void notificarParticipantesEvento(@PathVariable Integer eventoId,
+    public void notificarParticipantesEvento(@PathVariable("eventoId") Integer eventoId,
                                              @RequestBody NotificaoCreateDTO dto) {
         notificacaoService.enviarNotificacaoParaParticipantesDoEvento(
                 eventoId,
@@ -42,7 +42,7 @@ public class NotificacaoController {
     }
 
     @GetMapping
-    public List<NotificaoDTO> listarPorParticipante(@RequestParam Integer participanteId) {
+    public List<NotificaoDTO> listarPorParticipante(@RequestParam("participanteId") Integer participanteId) {
 
         List<Notificacao> lista = notificacaoService.listarNotificacoes(participanteId);
 
@@ -52,8 +52,8 @@ public class NotificacaoController {
     }
 
     @PutMapping("/{id}/ler")
-    public NotificaoDTO marcarComoLida(@PathVariable Integer id,
-                                         @RequestParam Integer participanteId) {
+    public NotificaoDTO marcarComoLida(@PathVariable("id") Integer id,
+                                       @RequestParam("participanteId") Integer participanteId) {
 
         Notificacao n = notificacaoService.marcarComoLida(id, participanteId);
         return new NotificaoDTO(n);

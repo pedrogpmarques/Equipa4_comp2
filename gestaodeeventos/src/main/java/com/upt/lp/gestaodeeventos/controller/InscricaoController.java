@@ -43,8 +43,9 @@ public class InscricaoController {
     }
 
     @PutMapping("/{id}/cancelar")
-    public void cancelar(@PathVariable Integer id,
-                         @RequestParam Integer participanteId) {
+    public void cancelar(@PathVariable("id") Integer id,
+                         @RequestParam("participanteId") Integer participanteId) {
         inscricaoService.cancelarInscricao(id, participanteId);
     }
+
 }
